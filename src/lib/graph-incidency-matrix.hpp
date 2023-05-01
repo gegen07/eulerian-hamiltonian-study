@@ -13,10 +13,12 @@
 #include <vector>
 #include <unordered_map>
 #include <stack>
+#include <map>
 
 class IncMatrix : public Graph {
     private:
         std::vector<std::vector<int>> adj;
+        std::map<std::pair<int, int>, int> edges;
 
 
         void dfs(int v, std::vector<int>& visited) override {
@@ -42,6 +44,7 @@ class IncMatrix : public Graph {
                 this->num_edges--;
                 adj[u][this->num_edges] += 1;
                 adj[v][this->num_edges] += 1;
+                edges[{std::max(u,v), std::min(u,v)}] = this->num_edges;
             }
         }
 
@@ -52,7 +55,9 @@ class IncMatrix : public Graph {
         }
 
         void deleteEdge(int u, int v) override {
-            adj[u][v]--;
+            int edge = this->edges[{std::max(u,v), std::min(u,v)}];
+            adj[u][edge]--;
+            adj[v][edge]--;
         }
 
         std::vector<int> getAdjacentVertices(int v) override {

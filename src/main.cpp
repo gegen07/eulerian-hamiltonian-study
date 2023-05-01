@@ -4,10 +4,16 @@
 #include "lib/graph.hpp"
 #include <ios>
 #include <iostream>
+#include <ostream>
+#include <set>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <chrono>
+#include <iomanip>
 
 std::vector<std::vector<int>> read_input() {
     std::ifstream file;
@@ -44,7 +50,7 @@ Graph * createAdjMatrixFromFile(std::string filename) {
 
     for (int i=0; i<graph.size(); i++) adj->insertEdge(i, graph[i]);
 
-    return NULL;
+    return adj;
 }
 
 Graph * createAdjListFromFile(std::string filename) {
@@ -60,12 +66,25 @@ Graph * createAdjListFromFile(std::string filename) {
 
 Graph * createIncMatrixFromFile(std::string filename) {
     std::vector<std::vector<int>> graph = read_input();
-    int num_vertices = graph.size();
-    int num_edges = 0;
-   
-    for (int i=0; i<graph.size(); i++) num_edges += graph[i].size();
 
-    return NULL; // TODO
+    std::set<std::pair<int, int>> gSet;
+
+    for (int i=0; i<graph.size(); i++) {
+        for (int j=0; j<graph[i].size(); j++) {
+            gSet.insert({std::max(i, graph[i][j]), std::min(i, graph[i][j])});
+        }
+    }
+
+    int num_vertices = graph.size();
+    int num_edges = gSet.size();
+    
+    Graph* g = new IncMatrix(num_vertices, num_edges);
+
+    for (auto p: gSet) {
+        g->insertEdge(p.first, p.second);
+    }
+
+    return g;
 }
 
 
@@ -90,9 +109,22 @@ int main() {
 
     // g->to_string();
 
-    Graph * g = createAdjListFromFile("./generators/graph-15.txt");
+    Graph * g = createAdjMatrixFromFile("./generators/graph-15.txt");
+
+    // g->to_string();
+
+    time_t start, end;
+    time(&start);
 
     std::vector<int> circuit = g->eulerianCircuit();
+
+    time(&end);
+
+    double time_taken = double(end - start);
+    std::cout << "Time taken by program is : " << std::fixed
+        << std::setprecision(10) << time_taken;
+    std::cout << " sec " << std::endl;
+ 
 
     for (int i=circuit.size()-1; i >= 0; i--) {
         std::cout << circuit[i];
@@ -101,13 +133,13 @@ int main() {
     }
     std::cout << std::endl;
 
-    bool check = g->checkHamiltonianRule();
+    // bool check = g->checkHamiltonianRule();
 
-    if (check) {
-        std::cout << "É hamiltoniano" << std::endl;
-    } else {
-        std::cout << "Inconclusivo" << std::endl;
-    }
+    // if (check) {
+    //     std::cout << "É hamiltoniano" << std::endl;
+    // } else {
+    //     std::cout << "Inconclusivo" << std::endl;
+    // }
 
     return 0;
 }
