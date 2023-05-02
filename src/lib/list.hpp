@@ -16,7 +16,7 @@ class List {
     public:
         virtual void insert(int item, int index) = 0;
         virtual int remove(int index) = 0;
-        virtual int access(int index) = 0;
+        virtual int access(int index, int& op) = 0;
         virtual bool search(int item) = 0;
         virtual void sort() = 0;
         virtual std::string to_string() = 0;

@@ -24,13 +24,13 @@ def create_eulerian_graph (n_nodes = 8, max_edges = 50) :
     return m
 
 def graph_to_file (m , nodes) :
-    with open(f'graph-{nodes}.txt', 'w') as fp:
+    with open(f'eulerian/graph-{nodes}.txt', 'w') as fp:
         for edges in m :
             linked = [str(i) for i, e in enumerate(edges) if e == 1]
             fp.write(','.join(linked))
             fp.write('\n')
 
 if __name__ == "__main__":
-    nodes = 15
-    m = create_eulerian_graph(nodes)
-    graph_to_file(m, nodes)
+    for x in range(3, 50):
+        m = create_eulerian_graph(x)
+        graph_to_file(m, x)

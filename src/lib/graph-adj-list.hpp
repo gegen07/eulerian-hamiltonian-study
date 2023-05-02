@@ -19,8 +19,9 @@ class AdjList : public Graph {
 
         void dfs(int v, std::vector<int>& visited) override {
             visited[v] = 1;
+            int op;
             for (int i=0; i<adj[v].size(); i++) {
-                int v = adj[v].access(i);
+                int v = adj[v].access(i, op);
                 if (!visited[v]) {
                     dfs(v, visited);
                 }
@@ -52,25 +53,25 @@ class AdjList : public Graph {
             adj[u].removeItem(v);
         }
 
-        std::vector<int> getAdjacentVertices(int v) override {
+        std::vector<int> getAdjacentVertices(int v, int& op) override {
             std::vector<int> adjacents(adj[v].size());
 
             for (int i=0; i<adj[v].size(); i++) {
-                int x = adj[v].access(i);
+                int x = adj[v].access(i, op);
                 adjacents[i] = x;
             }
 
             return adjacents;
         }
 
-        Graph* getInducedSubgraph(std::vector<int> removedVertices) override {
+        Graph* getInducedSubgraph(std::vector<int> removedVertices, int& op) override {
             Graph* inducedSubgraph = new AdjList(this->num_vertices - removedVertices.size());
 
             int v=0;
             for (int i=0; i<this->num_vertices; i++) {
                 if (i!=removedVertices[v]) {
                     for (int j=0; j<this->adj[i].size(); j++) 
-                        inducedSubgraph->insertEdge(v, adj[i].access(j));
+                        inducedSubgraph->insertEdge(v, adj[i].access(j, op));
                 }
             }
 

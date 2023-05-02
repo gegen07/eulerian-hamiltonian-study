@@ -15,10 +15,17 @@
 #include <chrono>
 #include <iomanip>
 
-std::vector<std::vector<int>> read_input() {
+
+struct stat {
+    int op;
+    long vertices;
+    long edges;
+}; 
+
+std::vector<std::vector<int>> read_input(std::string filename) {
     std::ifstream file;
     
-    file.open("./generators/graph-15.txt");
+    file.open(filename);
     
     std::vector<std::vector<int>> graph;
 
@@ -42,9 +49,16 @@ std::vector<std::vector<int>> read_input() {
 }
 
 
-Graph * createAdjMatrixFromFile(std::string filename) {
-    std::vector<std::vector<int>> graph = read_input();
+Graph * createAdjMatrixFromFile(std::string filename, struct stat& stats) {
+    std::vector<std::vector<int>> graph = read_input(filename);
     int num_vertices = graph.size();
+
+    stats.vertices = num_vertices;
+
+    int edges = 0;
+    for (int i=0; i<graph.size(); i++) edges += graph[i].size();
+    
+    stats.edges = edges;
 
     Graph* adj = new AdjMatrix(num_vertices);
 
@@ -53,9 +67,16 @@ Graph * createAdjMatrixFromFile(std::string filename) {
     return adj;
 }
 
-Graph * createAdjListFromFile(std::string filename) {
-    std::vector<std::vector<int>> graph = read_input();
+Graph * createAdjListFromFile(std::string filename, struct stat& stats) {
+    std::vector<std::vector<int>> graph = read_input(filename);
     int num_vertices = graph.size();
+
+    stats.vertices = num_vertices;
+
+    int edges = 0;
+    for (int i=0; i<graph.size(); i++) edges += graph[i].size();
+    
+    stats.edges = edges;
 
     Graph* adj = new AdjList(num_vertices);
 
@@ -64,8 +85,8 @@ Graph * createAdjListFromFile(std::string filename) {
     return adj;
 }
 
-Graph * createIncMatrixFromFile(std::string filename) {
-    std::vector<std::vector<int>> graph = read_input();
+Graph * createIncMatrixFromFile(std::string filename, struct stat& stats) {
+    std::vector<std::vector<int>> graph = read_input(filename);
 
     std::set<std::pair<int, int>> gSet;
 
@@ -77,6 +98,9 @@ Graph * createIncMatrixFromFile(std::string filename) {
 
     int num_vertices = graph.size();
     int num_edges = gSet.size();
+
+    stats.vertices = num_vertices;
+    stats.edges = num_edges;
     
     Graph* g = new IncMatrix(num_vertices, num_edges);
 
@@ -87,59 +111,75 @@ Graph * createIncMatrixFromFile(std::string filename) {
     return g;
 }
 
+void save_stats_eulerian() { 
+    std::vector<struct stat> stats;
 
-int main() {
-    // std::vector<std::vector<int>> graph = read_input();
+    for (int i=3; i<50; i++) {
+        struct stat st;
 
-    // for (int i=0; graph.size(); i++) {
-    //     for (int j=0; j<graph[i].size(); j++) {
-    //         std::cout << graph[i][j] << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
+        std::string s = "./generators/eulerian/graph-" + std::to_string(i) + ".txt";
+        Graph * g = createAdjMatrixFromFile(s, st);
 
-    // Graph *g = new IncMatrix(3, 4);
+        int op;
 
-    // Graph *g = new AdjList(3);
+        std::vector<int> circuit = g->eulerianCircuit(st.op); 
 
-    // g->insertEdge(0, {1, 2});
-    // g->insertEdge(1, {0, 2});
-    // g->insertEdge(2, {0, 1});
-    // // g->insertEdge(3, 0);
+        for (int i=circuit.size()-1; i >= 0; i--) {
+            std::cout << circuit[i];
 
-    // g->to_string();
+            if (i) std::cout << " - ";
+        }
 
-    Graph * g = createAdjMatrixFromFile("./generators/graph-15.txt");
+        std::cout << std::endl;
 
-    // g->to_string();
-
-    time_t start, end;
-    time(&start);
-
-    std::vector<int> circuit = g->eulerianCircuit();
-
-    time(&end);
-
-    double time_taken = double(end - start);
-    std::cout << "Time taken by program is : " << std::fixed
-        << std::setprecision(10) << time_taken;
-    std::cout << " sec " << std::endl;
- 
-
-    for (int i=circuit.size()-1; i >= 0; i--) {
-        std::cout << circuit[i];
-
-        if (i) std::cout << " - ";
+        stats.push_back(st);
     }
-    std::cout << std::endl;
 
-    // bool check = g->checkHamiltonianRule();
+    std::ofstream out("adjacency_matrix_eulerian.csv");
 
-    // if (check) {
-    //     std::cout << "É hamiltoniano" << std::endl;
-    // } else {
-    //     std::cout << "Inconclusivo" << std::endl;
-    // }
+    out << "v,e,op" << std::endl;
+    for (stat s: stats) {
+        out << s.vertices << "," << s.edges << "," << s.op << std::endl;
+    }
+}
+
+void save_stats_hamiltonian() {
+    std::vector<struct stat> stats;
+
+    for (int i=14; i<15; i++) {
+        struct stat st;
+
+        std::cout << i << std::endl;
+
+        std::string s = "./generators/hamiltonian/graph-" + std::to_string(i) + ".txt";
+        Graph * g = createAdjMatrixFromFile(s, st);
+
+        int op;
+
+        bool check = g->checkHamiltonianRule(st.op);
+
+        if (check) {
+            std::cout << "É hamiltoniano" << std::endl;
+        } else {
+            std::cout << "Inconclusivo" << std::endl;
+        }
+
+        std::cout << std::endl;
+
+        stats.push_back(st);
+    }
+
+    std::ofstream out("../analysis/adjacency_matrix_hamiltonian.csv");
+
+    out << "v,e,op" << std::endl;
+    for (stat s: stats) {
+        out << s.vertices << "," << s.edges << "," << s.op << std::endl;
+    }
+}
+
+
+int main() {    
+    save_stats_hamiltonian();
 
     return 0;
 }

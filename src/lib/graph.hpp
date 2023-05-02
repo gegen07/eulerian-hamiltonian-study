@@ -29,13 +29,15 @@ class Graph {
             this->num_edges = edges;
         }
 
+        virtual ~Graph() {}
+
         virtual void insertEdge(int u, int v) = 0;
         virtual void insertEdge(int v, std::vector<int> vertexes) = 0;
         virtual void deleteEdge(int u, int v) = 0;
-        virtual std::vector<int> getAdjacentVertices(int v) = 0;
+        virtual std::vector<int> getAdjacentVertices(int v, int& op) = 0;
         virtual std::unordered_map<int, int> outdegree() = 0;
         virtual std::unordered_map<int, int> degree() = 0;
-        virtual Graph* getInducedSubgraph(std::vector<int> removedVertices) = 0;
+        virtual Graph* getInducedSubgraph(std::vector<int> removedVertices, int &op) = 0;
         virtual void to_string() = 0;
         
         int connectedComponents() {
@@ -63,7 +65,7 @@ class Graph {
             return true;
         }
 
-        std::vector<int> eulerianCircuit() {
+        std::vector<int> eulerianCircuit(int& op) {
             if (!hasEulerianCircuit()) {
                 return std::vector<int>(1);
             }
@@ -79,7 +81,7 @@ class Graph {
                 if (outs[currentVertex]) {
                     currentPath.push(currentVertex);
 
-                    std::vector<int> adjacent = getAdjacentVertices(currentVertex);
+                    std::vector<int> adjacent = getAdjacentVertices(currentVertex, op);
 
                     int nextVertex = adjacent[0];
 
@@ -102,22 +104,22 @@ class Graph {
         }
         
         
-        bool checkHamiltonianRule() {
+        bool checkHamiltonianRule(int &op) {
             std::vector<int> v;
 
             for (int i=0; i<this->num_vertices; i++) v.push_back(i);
             std::vector<std::vector<int>> subsets = utils::getSubsets(v, v.size());
 
             for (std::vector<int> ss: subsets) {
-                std::cout << ss.size() << std::endl;
                 if (ss.size() > 0 && ss.size() < this->num_vertices) {
-                    Graph *inducedSubgraph = getInducedSubgraph(ss);
+                    Graph *inducedSubgraph = getInducedSubgraph(ss, op);
 
                     int numComponents = inducedSubgraph->connectedComponents();
 
-                    std::cout << numComponents << std::endl;
+                    // delete inducedSubgraph;
 
                     if (numComponents > ss.size()) return false;
+
                 }
             }
 

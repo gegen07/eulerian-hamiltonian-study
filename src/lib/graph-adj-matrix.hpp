@@ -51,17 +51,18 @@ class AdjMatrix : public Graph {
             adj[u][v]--;
         }
 
-        std::vector<int> getAdjacentVertices(int v) override {
+        std::vector<int> getAdjacentVertices(int v, int& op) override {
             std::vector<int> adjacents;
 
             for (int i=0; i<adj[v].size(); i++) {
-                if (adj[v][i] > 0 && i != v) adjacents.push_back(i);
+                if (adj[v][i] > 0 && i != v) { adjacents.push_back(i); }
+                op+=2;
             }
 
             return adjacents;
         }
 
-        Graph* getInducedSubgraph(std::vector<int> removedVertices) override {
+        Graph* getInducedSubgraph(std::vector<int> removedVertices, int& op) override {
 
             Graph *inducedSubgraph = new AdjMatrix(this->num_vertices - removedVertices.size());
 
@@ -82,15 +83,17 @@ class AdjMatrix : public Graph {
             // std::cout << "induced subgraph created" << std::endl;
             for (int i=0; i<adj.size(); i++) {
                 if (!rmv[i]) {
-                    for (int k=0; k<adj[i].size(); k++)
+                    for (int k=0; k<adj[i].size(); k++) {
                         if (adj[i][k] >= 1 and !rmv[k]) {
                             inducedSubgraph->insertEdge(j, k-offset[k]);
                             // std::cout << j << " " << k << " " << offset[k] << std::endl;
                         }
+                        op+=2;
+                    }
                     j++;
                 }
+                op+=1;
             }
-            inducedSubgraph->to_string();
 
             return inducedSubgraph;
         }

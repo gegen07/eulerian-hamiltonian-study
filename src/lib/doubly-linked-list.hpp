@@ -154,7 +154,7 @@ class DoublyLinkedList : public List {
 
         // Worst-case: O(n) 
         // Best-case: O(1)
-        int access(int index) override {
+        int access(int index, int &op) override {
 
             if (index < 0) {
                 throw std::invalid_argument("index is less than zero");
@@ -166,6 +166,7 @@ class DoublyLinkedList : public List {
 
                 while (p->next!=NULL && index--) {
                     p = p->next;
+                    op++;
                 }
 
                 item = p->item;

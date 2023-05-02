@@ -60,21 +60,20 @@ class IncMatrix : public Graph {
             adj[v][edge]--;
         }
 
-        std::vector<int> getAdjacentVertices(int v) override {
+        std::vector<int> getAdjacentVertices(int v, int& op) override {
             std::vector<int> adjacents;
 
             for (int i=0; i<adj[0].size(); i++) {
-                if (adj[v][i] > 0) {
-                    for (int j=0; j<num_vertices; j++) {
-                        if (adj[j][i] > 0 and j != v) { adjacents.push_back(j); }
-                    }
+                for (int j=0; j<num_vertices; j++) {
+                    if (adj[v][i] and adj[j][i] > 0 and j != v) { adjacents.push_back(j); }
+                    op+=3;
                 }
             }
 
             return adjacents;
         }
 
-        Graph* getInducedSubgraph(std::vector<int> removedVertices) override {
+        Graph* getInducedSubgraph(std::vector<int> removedVertices, int& op) override {
             Graph* inducedSubgraph = new IncMatrix(this->num_vertices - removedVertices.size(), this->adj[0].size());
 
             int v=0;
