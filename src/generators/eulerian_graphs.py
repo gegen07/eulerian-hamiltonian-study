@@ -31,6 +31,6 @@ def graph_to_file (m , nodes) :
             fp.write('\n')
 
 if __name__ == "__main__":
-    for x in range(3, 50):
+    for x in range(3, 100):
         m = create_eulerian_graph(x)
         graph_to_file(m, x)

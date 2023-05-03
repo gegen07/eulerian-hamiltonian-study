@@ -114,7 +114,7 @@ Graph * createIncMatrixFromFile(std::string filename, struct stat& stats) {
 void save_stats_eulerian() { 
     std::vector<struct stat> stats;
 
-    for (int i=3; i<50; i++) {
+    for (int i=0; i<65; i++) {
         struct stat st;
 
         std::string s = "./generators/eulerian/graph-" + std::to_string(i) + ".txt";
@@ -179,7 +179,7 @@ void save_stats_hamiltonian() {
 
 
 int main() {    
-    save_stats_hamiltonian();
-
+    // save_stats_hamiltonian();
+    save_stats_eulerian();
     return 0;
 }

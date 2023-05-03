@@ -116,8 +116,6 @@ class Graph {
 
                     int numComponents = inducedSubgraph->connectedComponents();
 
-                    // delete inducedSubgraph;
-
                     if (numComponents > ss.size()) return false;
 
                 }

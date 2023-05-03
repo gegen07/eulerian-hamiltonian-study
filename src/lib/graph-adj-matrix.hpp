@@ -71,7 +71,7 @@ class AdjMatrix : public Graph {
             for (int i=0; i < removedVertices.size(); i++) rmv[i] = true;
 
             std::vector<int> offset(this->num_vertices-removedVertices.size());
-            if (rmv[0]) offset[0] = 1;
+            if (rmv[0]) offset[0] = 1; 
             for (int i=1; i<this->num_vertices; i++) {
                 offset[i] = offset[i-1];
                 if (rmv[i]) offset[i]+=1;
